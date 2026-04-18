@@ -1,0 +1,17 @@
+[Unit]
+Description=VEXOS Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/vexos
+ExecStart=/opt/vexos/main
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/vexos.log
+StandardError=append:/var/log/vexos.log
+
+[Install]
+WantedBy=multi-user.target
