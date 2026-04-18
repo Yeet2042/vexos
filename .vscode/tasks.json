@@ -1,0 +1,65 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Docker Compose Up",
+      "type": "shell",
+      "command": "docker compose -f deploy/docker-compose.dev.yml up -d",
+      "problemMatcher": [],
+      "options": {
+        "shell": {
+          "executable": "/bin/bash",
+          "args": [
+            "-c",
+            "docker compose -f deploy/docker-compose.dev.yml up -d && exit"
+          ]
+        }
+      },
+      "presentation": {
+        "close": true
+      }
+    },
+    {
+      "label": "Run Docker Compose Down",
+      "type": "shell",
+      "command": "docker compose -f deploy/docker-compose.dev.yml down",
+      "problemMatcher": [],
+      "options": {
+        "shell": {
+          "executable": "/bin/bash",
+          "args": [
+            "-c",
+            "docker compose -f deploy/docker-compose.dev.yml down && exit"
+          ]
+        }
+      },
+      "presentation": {
+        "close": true
+      }
+    },
+    {
+      "label": "Start Node Agent",
+      "type": "shell",
+      "command": "go run cmd/node_agent/main.go",
+      "group": "build",
+      "presentation": {
+        "panel": "dedicated",
+        "group": "backend",
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Orchestrator",
+      "type": "shell",
+      "command": "go run cmd/orchestrator/main.go",
+      "group": "build",
+      "presentation": {
+        "panel": "dedicated",
+        "group": "backend",
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

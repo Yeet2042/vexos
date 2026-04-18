@@ -1,0 +1,5 @@
+server:
+  environment: "dev"
+  dns: "localhost"
+  port: 3001
+  frontendURL: "http://localhost:3000"
