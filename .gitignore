@@ -43,6 +43,9 @@ certs/
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+/tools/vexos-ebpf/target
+/tools/vexos-ebpf/Cargo.lock
+
 # dependencies
 /ui/node_modules
 /.pnp
