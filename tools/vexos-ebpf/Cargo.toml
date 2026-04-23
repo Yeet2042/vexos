@@ -12,3 +12,4 @@ crate-type = ["cdylib"]
 lto = true
 opt-level = "z"
 panic = "abort"
+strip = false
