@@ -13,7 +13,7 @@ type SurrealdbConfig struct {
 	Database  string
 }
 
-type Surrealdb struct {
+type sdb struct {
 	db surrealdb.Driver
 }
 
@@ -26,6 +26,10 @@ func NewSurrealdb(
 ) {
 	if config == nil {
 		return nil, fmt.Errorf("[pkg/database]: config is nil")
+	} else if config.Namespace == "" {
+		return nil, fmt.Errorf("[pkg/database]: namespace is empty")
+	} else if config.Database == "" {
+		return nil, fmt.Errorf("[pkg/database]: database is empty")
 	}
 
 	dbURL := fmt.Sprintf("surrealkv://%s", config.Path)
@@ -40,14 +44,14 @@ func NewSurrealdb(
 		return nil, fmt.Errorf("[pkg/database]: failed to select namespace and database: %w", err)
 	}
 
-	return &Surrealdb{db: db}, nil
+	return &sdb{db: db}, nil
 }
 
-func (s *Surrealdb) GetDB() surrealdb.Driver {
+func (s *sdb) GetDB() surrealdb.Driver {
 	return s.db
 }
 
-func (s *Surrealdb) Close() {
+func (s *sdb) Close() {
 	if s.db != nil {
 		s.GetDB().Close()
 	}

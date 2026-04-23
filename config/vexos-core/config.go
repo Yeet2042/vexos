@@ -6,7 +6,8 @@ import (
 
 type (
 	VEXOSConfig struct {
-		Server *Server
+		Server   *Server
+		Database *Database
 	}
 
 	Server struct {
@@ -14,6 +15,12 @@ type (
 		DNS         string
 		Port        int
 		FrontendURL string
+	}
+
+	Database struct {
+		Path      string
+		Namespace string
+		Database  string
 	}
 )
 

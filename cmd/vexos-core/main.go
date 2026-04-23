@@ -11,6 +11,8 @@ import (
 	config "github.com/Yeet2042/vexos/config/vexos-core"
 	vexosservice "github.com/Yeet2042/vexos/internal/core/vexos-core"
 	cfg "github.com/Yeet2042/vexos/pkg/cfg"
+	"github.com/Yeet2042/vexos/pkg/database"
+	fiberserver "github.com/Yeet2042/vexos/pkg/fiber-server"
 )
 
 func main() {
@@ -21,10 +23,30 @@ func main() {
 	// ----- Initialize Config
 	config, err := cfg.NewConfig[config.VEXOSConfig]("config/vexos-core/config.yml")
 	if err != nil {
-		log.Fatalf("[main]: Failed to load config: %v", err)
+		log.Printf("[main]: Failed to load config: %v", err)
+		return
 	}
 
 	// ----- Initialize Package
+	database, err := database.NewSurrealdb(ctx, &database.SurrealdbConfig{
+		Path:      config.Database.Path,
+		Namespace: config.Database.Namespace,
+		Database:  config.Database.Database,
+	})
+	if err != nil {
+		log.Printf("[cmd/apss_main]: failed to connect to database: %v", err)
+		return
+	}
+	defer database.Close()
+
+	fiber, err := fiberserver.NewFiber(&fiberserver.FiberConfig{
+		Port: config.Server.Port,
+	})
+	if err != nil {
+		log.Printf("[main]: Failed to initialize Fiber server: %v", err)
+		return
+	}
+	defer fiber.Close()
 
 	// ----- Initialize Module
 
@@ -33,14 +55,16 @@ func main() {
 		config,
 	)
 	if err != nil {
-		log.Fatalf("[main]: Failed to initialize Core Service: %v", err)
+		log.Printf("[main]: Failed to initialize Core Service: %v", err)
+		return
 	}
 
 	// ----- Start Core Service
 	log.Println("[main]: Starting Core Service...")
 	err = service.Start(ctx)
 	if err != nil && !errors.Is(err, context.Canceled) {
-		log.Fatalf("[main]: Failed to start Core Service: %v", err)
+		log.Printf("[main]: Failed to start Core Service: %v", err)
+		return
 	}
 
 	log.Println("[main]: Graceful shutdown complete.")

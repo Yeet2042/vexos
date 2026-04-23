@@ -3,3 +3,7 @@ server:
   dns: "localhost"
   port: 3001
   frontendURL: "http://localhost:3000"
+database:
+  path: ""
+  namespace: "vexos"
+  database: "vexos"
