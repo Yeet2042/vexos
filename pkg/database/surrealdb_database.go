@@ -17,11 +17,11 @@ type Surrealdb struct {
 	db surrealdb.Driver
 }
 
-func NewSurrealdbInstance(
+func NewSurrealdb(
 	ctx context.Context,
 	config *SurrealdbConfig,
 ) (
-	DatabaseInstance,
+	Database,
 	error,
 ) {
 	if config == nil {
