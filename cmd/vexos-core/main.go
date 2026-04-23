@@ -11,7 +11,6 @@ import (
 	config "github.com/Yeet2042/vexos/config/vexos-core"
 	vexosservice "github.com/Yeet2042/vexos/internal/core/vexos-core"
 	cfg "github.com/Yeet2042/vexos/pkg/cfg"
-	"github.com/Yeet2042/vexos/pkg/database"
 	fiberserver "github.com/Yeet2042/vexos/pkg/fiber-server"
 )
 
@@ -28,16 +27,16 @@ func main() {
 	}
 
 	// ----- Initialize Package
-	database, err := database.NewSurrealdb(ctx, &database.SurrealdbConfig{
-		Path:      config.Database.Path,
-		Namespace: config.Database.Namespace,
-		Database:  config.Database.Database,
-	})
-	if err != nil {
-		log.Printf("[cmd/apss_main]: failed to connect to database: %v", err)
-		return
-	}
-	defer database.Close()
+	// database, err := database.NewSurrealdb(ctx, &database.SurrealdbConfig{
+	// 	Path:      config.Database.Path,
+	// 	Namespace: config.Database.Namespace,
+	// 	Database:  config.Database.Database,
+	// })
+	// if err != nil {
+	// 	log.Printf("[cmd/apss_main]: failed to connect to database: %v", err)
+	// 	return
+	// }
+	// defer database.Close()
 
 	fiber, err := fiberserver.NewFiber(&fiberserver.FiberConfig{
 		Port: config.Server.Port,
@@ -53,6 +52,7 @@ func main() {
 	// ----- Initialize Core Service
 	service, err := vexosservice.NewV1(
 		config,
+		fiber,
 	)
 	if err != nil {
 		log.Printf("[main]: Failed to initialize Core Service: %v", err)

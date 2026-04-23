@@ -6,18 +6,23 @@ import (
 	"time"
 
 	config "github.com/Yeet2042/vexos/config/vexos-core"
+	fiberserver "github.com/Yeet2042/vexos/pkg/fiber-server"
+	"github.com/gofiber/fiber/v3"
 	"golang.org/x/sync/errgroup"
 )
 
 type v1 struct {
 	config *config.VEXOSConfig
+	fiber  fiberserver.FiberServer
 }
 
 func NewV1(
 	config *config.VEXOSConfig,
+	fiber fiberserver.FiberServer,
 ) (V1, error) {
 	return &v1{
 		config: config,
+		fiber:  fiber,
 	}, nil
 }
 
@@ -27,6 +32,14 @@ func (v *v1) Start(ctx context.Context) error {
 	g, _ := errgroup.WithContext(ctx)
 
 	// ----- Start Modules
+	// TODO: start modules here and add them to the errgroup, e.g.:
+	// g.Go(func() error {
+	// 	return module.Start(ctx)
+	// })
+
+	// ----- Start HTTP Server
+	v.initializeRoutesV1()
+	v.fiber.Start()
 
 	// receive output from g.Wait()
 	done := make(chan error, 1)
@@ -49,4 +62,18 @@ func (v *v1) Start(ctx context.Context) error {
 		// timeout waiting for modules to shut down
 		return errors.New("[Timeout] Graceful shutdown failed: timed out after 10 seconds")
 	}
+}
+
+func (v *v1) initializeRoutesV1() {
+	route := v.fiber.App().Group("/v1")
+
+	// endpoint
+	// TODO: add endpoints here, e.g.:
+	// route.Get("/example", exampleHandler)
+
+	// health check endpoint
+	route.Get("/health", func(ctx fiber.Ctx) error {
+		return ctx.JSON(fiber.Map{"status": "ok"})
+	})
+
 }
