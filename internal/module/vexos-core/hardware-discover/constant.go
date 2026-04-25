@@ -1,6 +1,7 @@
 package hardwarediscover
 
 type CPUArchitecture string
+type CPUCoreType string
 type MemoryType string
 type DiskType string
 type DiskBusType string
@@ -8,6 +9,12 @@ type DiskBusType string
 const (
 	CPUArchitectureX86_64 CPUArchitecture = "x86_64"
 	CPUArchitectureARM64  CPUArchitecture = "aarch64"
+)
+
+const (
+	CPUCoreTypePerformance CPUCoreType = "performance"
+	CPUCoreTypeEfficiency  CPUCoreType = "efficiency"
+	CPUCoreTypeUnknown     CPUCoreType = "standard"
 )
 
 const (
