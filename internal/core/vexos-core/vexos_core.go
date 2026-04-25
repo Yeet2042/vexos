@@ -11,23 +11,23 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type v1 struct {
+type service struct {
 	config *config.VEXOSConfig
 	fiber  fiberserver.FiberServer
 }
 
-func NewV1(
+func New(
 	config *config.VEXOSConfig,
 	fiber fiberserver.FiberServer,
-) (V1, error) {
-	return &v1{
+) (*service, error) {
+	return &service{
 		config: config,
 		fiber:  fiber,
 	}, nil
 }
 
-// Start implements [V1].
-func (v *v1) Start(ctx context.Context) error {
+// Start implements the Service interface.
+func (v *service) Start(ctx context.Context) error {
 	// create an errgroup with the provided context
 	g, _ := errgroup.WithContext(ctx)
 
@@ -64,7 +64,7 @@ func (v *v1) Start(ctx context.Context) error {
 	}
 }
 
-func (v *v1) initializeRoutesV1() {
+func (v *service) initializeRoutesV1() {
 	route := v.fiber.App().Group("/v1")
 
 	// endpoint
@@ -73,7 +73,10 @@ func (v *v1) initializeRoutesV1() {
 
 	// health check endpoint
 	route.Get("/health", func(ctx fiber.Ctx) error {
-		return ctx.JSON(fiber.Map{"status": "ok"})
+		return ctx.JSON(fiber.Map{
+			"status":    "ok",
+			"timestamp": time.Now().UTC(),
+		})
 	})
 
 }

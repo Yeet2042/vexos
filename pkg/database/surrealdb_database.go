@@ -17,7 +17,7 @@ type sdb struct {
 	db surrealdb.Driver
 }
 
-func NewSurrealdb(
+func New(
 	ctx context.Context,
 	config *SurrealdbConfig,
 ) (

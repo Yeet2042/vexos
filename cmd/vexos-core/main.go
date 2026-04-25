@@ -20,9 +20,15 @@ func main() {
 	defer cancel()
 
 	// ----- Initialize Config
-	config, err := cfg.NewConfig[config.VEXOSConfig]("config/vexos-core/config.yml")
+	config, err := cfg.New[config.VEXOSConfig]("config/vexos-core/config.yml")
 	if err != nil {
 		log.Printf("[main]: Failed to load config: %v", err)
+		return
+	}
+
+	err = config.Validate()
+	if err != nil {
+		log.Printf("[main]: Invalid config: %v", err)
 		return
 	}
 
@@ -38,7 +44,7 @@ func main() {
 	// }
 	// defer database.Close()
 
-	fiber, err := fiberserver.NewFiber(&fiberserver.FiberConfig{
+	fiber, err := fiberserver.New(&fiberserver.FiberConfig{
 		Port: config.Server.Port,
 	})
 	if err != nil {
@@ -50,7 +56,7 @@ func main() {
 	// ----- Initialize Module
 
 	// ----- Initialize Core Service
-	service, err := vexosservice.NewV1(
+	service, err := vexosservice.New(
 		config,
 		fiber,
 	)

@@ -13,7 +13,7 @@ type validator interface {
 	Validate() error
 }
 
-func NewConfig[T any](path string) (*T, error) {
+func New[T any](path string) (*T, error) {
 	if strings.TrimSpace(path) == "" {
 		return nil, fmt.Errorf("[pkg/config]: config path is required")
 	}

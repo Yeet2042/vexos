@@ -15,7 +15,7 @@ type fiberServer struct {
 	port int
 }
 
-func NewFiber(cfg *FiberConfig) (FiberServer, error) {
+func New(cfg *FiberConfig) (FiberServer, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("[pkg/fiber-server]: config is nil")
 	} else if cfg.Port <= 0 {
