@@ -1,6 +1,7 @@
 package fiberserver
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
@@ -39,4 +40,8 @@ func (f *fiberServer) Start() error {
 
 func (f *fiberServer) Close() error {
 	return f.app.Shutdown()
+}
+
+func (f *fiberServer) ShutdownWithContext(ctx context.Context) error {
+	return f.app.ShutdownWithContext(ctx)
 }

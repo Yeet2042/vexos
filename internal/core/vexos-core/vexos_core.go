@@ -2,7 +2,6 @@ package vexosservice
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	config "github.com/Yeet2042/vexos/config/vexos-core"
@@ -28,18 +27,15 @@ func New(
 
 // Start implements the Service interface.
 func (v *service) Start(ctx context.Context) error {
+	v.initializeRoutesV1()
+
 	// create an errgroup with the provided context
-	g, _ := errgroup.WithContext(ctx)
+	g, gCtx := errgroup.WithContext(ctx)
 
 	// ----- Start Modules
-	// TODO: start modules here and add them to the errgroup, e.g.:
-	// g.Go(func() error {
-	// 	return module.Start(ctx)
-	// })
-
-	// ----- Start HTTP Server
-	v.initializeRoutesV1()
-	v.fiber.Start()
+	g.Go(func() error {
+		return v.fiber.Start()
+	})
 
 	// receive output from g.Wait()
 	done := make(chan error, 1)
@@ -47,29 +43,26 @@ func (v *service) Start(ctx context.Context) error {
 		done <- g.Wait()
 	}()
 
-	// wait until either g.Wait() returns or the context is canceled
-	<-ctx.Done()
+	g.Go(func() error {
+		<-gCtx.Done()
 
-	// start a timer to enforce a maximum shutdown time
-	shutdownTimer := time.NewTimer(10 * time.Second)
-	defer shutdownTimer.Stop()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 
-	select {
-	case err := <-done:
-		// all module have completed or one has returned an error
-		return err
-	case <-shutdownTimer.C:
-		// timeout waiting for modules to shut down
-		return errors.New("[Timeout] Graceful shutdown failed: timed out after 10 seconds")
-	}
+		var sg errgroup.Group
+
+		sg.Go(func() error {
+			return v.fiber.ShutdownWithContext(shutdownCtx)
+		})
+
+		return sg.Wait()
+	})
+
+	return g.Wait()
 }
 
 func (v *service) initializeRoutesV1() {
 	route := v.fiber.App().Group("/v1")
-
-	// endpoint
-	// TODO: add endpoints here, e.g.:
-	// route.Get("/example", exampleHandler)
 
 	// health check endpoint
 	route.Get("/health", func(ctx fiber.Ctx) error {
@@ -79,4 +72,7 @@ func (v *service) initializeRoutesV1() {
 		})
 	})
 
+	// endpoint
+	// TODO: add endpoints here, e.g.:
+	// route.Get("/example", exampleHandler)
 }
